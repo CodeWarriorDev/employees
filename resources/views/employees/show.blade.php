@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employees List</title>
+    <title>{{$title}}</title>
     <style>
         table {
             width: 100%;
@@ -19,6 +19,12 @@
     </style>
 </head>
 <body>
+    <a href="{{ url('/employees-add') }}">Tambah Data</a>
+    @if (session('success')){
+        <p>{{ session('success') }}</p>
+    }
+        
+    @endif
     <table border="1">
         <thead>
             <tr>

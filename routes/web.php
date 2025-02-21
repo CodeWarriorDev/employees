@@ -9,5 +9,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/employees', [EmployeesController::class, 'show']);
+Route::get('/employees-data', [EmployeesController::class, 'show']);
+Route::get('/employees-add', [EmployeesController::class, 'add']);
+Route::post('/employees-insert', [EmployeesController::class, 'insert']);
 
