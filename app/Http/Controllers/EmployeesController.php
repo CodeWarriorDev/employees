@@ -62,6 +62,7 @@ class EmployeesController extends Controller
 
    public function insertWithValidation(Request $request)
        {
+           // Membuat validasi menggunakan Validator laravel
            $validator = Validator::make(
                $request->all(),
                [
@@ -71,6 +72,7 @@ class EmployeesController extends Controller
    
                ],
                [
+                   // Memberikan pesan error jika validasi gagal
                    'name.required' => 'Kolom Nama Wajib diisi',
                    'email.required' => 'Kolom Email wajib diisi',
                    'email.email' => 'harus berupa format email',
@@ -80,20 +82,25 @@ class EmployeesController extends Controller
                ]
            );
    
+           // Jika validasi gagal, redirect ke halaman 'employees-add' dengan pesan error
            if ($validator->fails()) {
                return redirect('employees-add')
                    ->with('error_validation', $validator->errors());
            }
    
+           // Jika validasi berhasil, maka lanjutkan insert data
            try {
                $data = [
                    'name' => $request->name,
                    'email' => $request->email,
                    'phone' => $request->phone
                ];
+               // Menyisipkan data ke tabel 'employees'
                DB::table('employees')->insert($data);
+               // Redirect ke halaman 'employees-data' dengan pesan sukses
                return redirect('employees-data')->with('result', 'Data Berhasil ditambahkan');
            } catch (Exception $e) {
+               // Jika terjadi error, redirect ke halaman 'employees-add' dengan pesan error
                return redirect('employees-add')->with('error', $e->getMessage());
            }
        }
