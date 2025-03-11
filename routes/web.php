@@ -12,4 +12,6 @@ Route::get('/', function () {
 Route::get('/employees-data', [EmployeesController::class, 'show']);
 Route::get('/employees-add', [EmployeesController::class, 'add']);
 Route::post('/employees-insert', [EmployeesController::class, 'insert']);
+Route::post('/employees-insert-validation', [EmployeesController::class, 'insertWithValidation']);
+
 

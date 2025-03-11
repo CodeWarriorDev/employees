@@ -4,7 +4,17 @@
 @if (session('error'))
     <p>{{ session('error') }}</p>
 @endif
-<form method="POST" action="{{ url('/employees-insert') }}">
+
+@if (session('error_validation')){
+    <ul>
+        @foreach (session('error_validation')->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+
+        }
+        <ul>
+@endif
+<form method="POST" action="{{ url('/employees-insert-validation') }}">
     @csrf
     <input type="text" placeholder="Masukkan Nama" name="name">
     <br>

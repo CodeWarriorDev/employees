@@ -6,24 +6,26 @@ use App\Models\EmployeesModel;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class EmployeesController extends Controller
 {
 
-    public function show()
-    {
-        // Mengambil semua data dari tabel 'employees'
-        $employees = DB::table('employees')->get();
+     public function show()
+        {
+            // Mengambil semua data dari tabel 'employees'
+            $employees = DB::table('employees')->get();
+    
+            // Menyiapkan data untuk dikirim ke view
+            $data = [
+                'title' => 'Data Karyawan', // Judul halaman
+                'employees' => $employees  // Daftar karyawan
+            ];
+    
+            // Mengembalikan view 'employees.show' dengan data
+            return view('employees.show', $data);
+        }
 
-        // Menyiapkan data untuk dikirim ke view
-        $data = [
-            'title' => 'Data Karyawan', // Judul halaman
-            'employees' => $employees  // Daftar karyawan
-        ];
-
-        // Mengembalikan view 'employees.show' dengan data
-        return view('employees.show', $data);
-    }
     public function add()
     {
         $data = [
@@ -35,28 +37,65 @@ class EmployeesController extends Controller
     //INSERT DATA
     public function insert(Request $request)
     {
-
+        // Mengakses input dari request
         $name = $request->input('name');
         $email = $request->input('email');
         $phone = $request->input('phone');
 
-        // dd($name, $email, $phone);
-
+        // Menyiapkan data untuk dimasukkan ke dalam tabel
         $data = [
             'name' => $name,
             'email' => $email,
             'phone' => $phone
         ];
-        // DB::table('employees')->insert($data);
 
         try {
+            // Menyisipkan data ke tabel 'employees'
             DB::table('employees')->insert($data);
-            return redirect('employees-data')->with('success','Data Berhasil ditambahkan');
+            // Redirect ke halaman 'employees-data' dengan pesan sukses
+            return redirect('employees-data')->with('success', 'Data Berhasil ditambahkan');
         } catch (Exception $e) {
+            // Redirect ke halaman 'employees-add' dengan pesan error
             return redirect('employees-add')->with('error', $e->getMessage());
-            // return redirect('employees-add')->with('error', 'Data gagal ditambahkan');
-
-         
         }
     }
+
+   public function insertWithValidation(Request $request)
+       {
+           $validator = Validator::make(
+               $request->all(),
+               [
+                   'name' => 'required', //Wajib disi
+                   'email' => 'required|email', //Wajib disi dan harus email
+                   'phone' => 'required|numeric', //Wajib disi dan harus angka, dengan panjang 11-12 angka
+   
+               ],
+               [
+                   'name.required' => 'Kolom Nama Wajib diisi',
+                   'email.required' => 'Kolom Email wajib diisi',
+                   'email.email' => 'harus berupa format email',
+                   'phone.required' => "Phone Wajib diisi",
+                   'phone.numeric' => "Phone harus angka",
+       
+               ]
+           );
+   
+           if ($validator->fails()) {
+               return redirect('employees-add')
+                   ->with('error_validation', $validator->errors());
+           }
+   
+           try {
+               $data = [
+                   'name' => $request->name,
+                   'email' => $request->email,
+                   'phone' => $request->phone
+               ];
+               DB::table('employees')->insert($data);
+               return redirect('employees-data')->with('result', 'Data Berhasil ditambahkan');
+           } catch (Exception $e) {
+               return redirect('employees-add')->with('error', $e->getMessage());
+           }
+       }
+       
 }
